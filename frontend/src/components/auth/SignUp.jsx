@@ -32,7 +32,6 @@ const SignUp = () => {
   const changeFileHandler = (e) => {
     setInput({ ...input, file: e.target.files?.[0] });
   };
-
   const submitHandler =async(e) => {
     e.preventDefault();
     
@@ -46,6 +45,7 @@ const SignUp = () => {
     {
       formData.append("file", input.file);
     }
+   
     try {
       dispatch(setLoading(true));
       const res =await axios.post(`${USER_API_END_POINT}/register`,formData,{
@@ -150,7 +150,7 @@ const SignUp = () => {
               />
             </div>
           </div>
-          {!Loading ? (
+          {Loading ? (
             <Button className="w-full my-3">
               <Loader2 /> Please Wait!!!{" "}
             </Button>

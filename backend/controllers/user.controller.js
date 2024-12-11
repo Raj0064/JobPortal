@@ -1,6 +1,10 @@
 import { User } from "../models/usermodel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
+
+//Sign Up
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
@@ -10,7 +14,19 @@ export const register = async (req, res) => {
         success: false,
       });
     }
+    const file = req.file;
+    let profilePhotoUrl;
 
+    if (file) {
+      // Cloudinary file upload
+      const fileUrl = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUrl.content);
+      profilePhotoUrl = cloudResponse.secure_url;
+    } else {
+      // Default profile photo
+      profilePhotoUrl =
+        "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=";
+    }
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
@@ -26,6 +42,9 @@ export const register = async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       role,
+      profile: {
+        profilePhoto: profilePhotoUrl,
+      },
     });
 
     return res.status(200).json({
@@ -116,55 +135,66 @@ export const logOut = async (req, res) => {
   }
 };
 
-
 //Update Profile
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const file=req.file
 
-    //Cloudinary
-    
+    const file = req.file;
 
-    const userId=req.id;
-    let user=await User.findById(userId);
+    // if (file) {
+    //   //Cloudinary
+    //   const fileUrl = getDataUri(file);
+    //   const cloudResponse = await cloudinary.uploader.upload(fileUrl.content);
+    // }
 
-    if(!user){
-    return res.status(400).json({
-      message: "User Not Found",
-      userId,
-      success: false,
+    const userId = req.id;
+    let user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User Not Found",
+        userId,
+        success: false,
+      });
+    }
+
+    //Updating data
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.profile.bio = bio;
+    if (skills) {
+      const skillsArray = skills.split(",");
+      user.profile.skills = skillsArray;
+    }
+
+    //resume comes here
+    if (file) {
+      //Cloudinary
+      const fileUrl = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUrl.content);
+      if (cloudResponse) {
+        user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
+        user.profile.resumeOriginalName = file.originalname; //save the original name
+      }
+    }
+    await user.save();
+
+    user = {
+      _id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      profile: user.profile,
+    };
+
+    return res.status(200).json({
+      message: "Profile Updated Successfully",
+      user,
+      success: true,
     });
-  }
-
-  //Updating data
-  if(fullname)  (user.fullname = fullname)
-  if(email) (user.email = email)
-  if(phoneNumber)  (user.phoneNumber = phoneNumber)
-  if(bio)  (user.profile.bio = bio)
-  if(skills) {
-    const skillsArray = skills.split(",");
-    user.profile.skills = skillsArray;
-  } 
-
-  //resume comes here
-  await user.save();
-
-   user = {
-     _id: user.id,
-     fullname: user.fullname,
-     email: user.email,
-     phoneNumber: user.phoneNumber,
-     role: user.role,
-     profile: user.profile,
-   };
-
-   return res.status(200).json({
-     message: "Profile Updated Successfully",
-     user,
-     success: true,
-   });
-
   } catch (error) {
     console.log(error);
   }

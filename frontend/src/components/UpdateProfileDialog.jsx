@@ -12,18 +12,17 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { USER_API_END_POINT } from "@/utils/constant";
-import { setUser } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
 import { toast } from "sonner";
 import axios from "axios";
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
 
-  const [loading,setLoading]=useState(false);
   const {user}=useSelector(store=>store.auth)
-
+const { loading } = useSelector((store) => store.auth);
   const dispatch=useDispatch();
   const [input,setInput]=useState({
     fullname:user?.fullname,
@@ -57,6 +56,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
       formData.append("file", input.file);
     }
     try {
+      dispatch(setLoading(true));
       const res =await axios.post(`${USER_API_END_POINT}/profile/update`,formData,{
         headers:{
           "Content-Type":"multipart/form-data"
@@ -72,6 +72,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
   } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    }finally{
+      dispatch(setLoading(false));
     }
   };
 
@@ -178,7 +180,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             <DialogFooter>
               {loading ? (
                 <Button className="w-full my-3">
-                  <Loader2 /> Please Wait!!!{" "}
+                  <Loader /> Please Wait!!!{" "}
                 </Button>
               ) : (
                 <Button
