@@ -22,9 +22,9 @@ const SignUp = () => {
     file: "",
   });
 
-  const navigate=useNavigate();
-  const dispatch=useDispatch();
-  const {Loading}=useSelector(store=>store.auth);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { Loading } = useSelector(store => store.auth);
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -32,37 +32,35 @@ const SignUp = () => {
   const changeFileHandler = (e) => {
     setInput({ ...input, file: e.target.files?.[0] });
   };
-  const submitHandler =async(e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    
-    const formData=new FormData();
-    formData.append("fullname",input.fullname);
+
+    const formData = new FormData();
+    formData.append("fullname", input.fullname);
     formData.append("email", input.email);
     formData.append("phoneNumber", input.phoneNumber);
     formData.append("password", input.password);
     formData.append("role", input.role);
-    if(input.file)
-    {
+    if (input.file) {
       formData.append("file", input.file);
     }
-   
+
     try {
       dispatch(setLoading(true));
-      const res =await axios.post(`${USER_API_END_POINT}/register`,formData,{
-        headers:{
-          "Content-Type":"multipart/form-data"
+      const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
         },
-      withCredentials:true,
-    })
-    if(res.data.success)
-    {
-      navigate("/login")
-      toast.success(res.data.message);
-    }
-  } catch (error) {
+        withCredentials: true,
+      })
+      if (res.data.success) {
+        navigate("/login")
+        toast.success(res.data.message);
+      }
+    } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
-    } finally{
+    } finally {
       dispatch(setLoading(false));
     }
   };

@@ -51,7 +51,7 @@ const Navbar = () => {
                   <Link to="/admin/companies">Companies</Link>
                 </li>
                 <li>
-                  <Link to="admin/jobs">Jobs</Link>
+                  <Link to="/admin/jobs">Jobs</Link>
                 </li>
               </>
             ) : (
@@ -100,12 +100,14 @@ const Navbar = () => {
                       </p>
                     </div>
                   </div>
+                  {user?.role==='recruiter'?"" :(
                   <Button variant="link" className="flex gap-3">
                     <CircleUserRound />
                     <span className="font-medium">
                       <Link to="/profile"> Profile </Link>
                     </span>
                   </Button>
+                    )}
                   <Button
                     variant="link"
                     className="flex gap-3"
