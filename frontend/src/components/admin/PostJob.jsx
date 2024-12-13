@@ -103,7 +103,7 @@ const PostJob = () => {
           </div>
           <div>
             <Label className='font-bold text-md '>Requirements</Label>
-            <Input type="text" placeholder="Website name" name="requirements" value={input.requirements} onChange={changeEventHandler} />
+            <Input type="text" placeholder="Requirements" name="requirements" value={input.requirements} onChange={changeEventHandler} />
           </div>
           <div>
             <Label className='font-bold text-md '>Salary</Label>

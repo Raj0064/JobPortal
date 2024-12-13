@@ -100,7 +100,7 @@ export const getApplicants = async (req, res) => {
     }
     return res.status(200).json({
       job,
-      success: false,
+      success: true,
     });
 
   } catch (error) {
@@ -133,7 +133,7 @@ export const updateStatus=async(req,res)=>{
 
     return res.status(200).json({
       message:"Application Updated Successfullly",
-      success: false,
+      success: true,
     });
   } catch (error) {
     console.log(error);

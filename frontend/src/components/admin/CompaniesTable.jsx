@@ -44,7 +44,7 @@ const CompaniesTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {companies.length == 0 ? <span>No Companies Found</span> : (
+          {companies.length == 0 || filterCompany.length==0 ? <span>No Companies Found</span> : (
             filterCompany.map((company) => (
               <TableRow key={company._id}>
                 <TableCell className="font-medium"><Avatar className="w-8 h-8">
